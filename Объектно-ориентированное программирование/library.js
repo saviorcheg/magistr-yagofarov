@@ -30,31 +30,33 @@ class Exam {
         this._tmp = JSON.parse(JSON.stringify(this._arr, fields));
         return this._tmp;
     }
-    orderBy = (fields, directs) => { 
-        const sortFn = (a, b, fields, direct) => { 
+    orderByRec = (fields, directs) => { 
+        const sorting = (a, b, fields, direct) => { 
             let res = 0; 
             const fieldArr = fields.split("."); 
             let field = fieldArr.shift(); 
             if (fieldArr.length > 0) { // если ещё есть поля
-                res = sortFn(a[field], b[field], fieldArr.join("."), direct); 
+                res = sorting(a[field], b[field], fieldArr.join("."), direct); 
             } else { //иначе сортируем
                 res = a[field] > b[field] ? 1 : -1; 
             }  
             return direct == "desc" ? -res : res; 
         }; 
  
-        const rec = (arr, fields, directs) => { 
+        const arrRecursion = (arr, fields, directs) => { 
             if (fields.length == 0) { 
                 return arr; 
             } 
-            const path = fields.shift(); 
-            const direct = directs.shift(); 
+            const path = fields.shift(); // что сортируем
+            const direct = directs.shift(); // как сортируем
+            console.log(path);
+            console.log(direct);
             arr.sort((a, b) => { 
-                return sortFn(a, b, path, direct); 
+                return sorting(a, b, path, direct); 
             }); 
-            return rec(arr, fields, directs); 
+            return arrRecursion(arr, fields, directs); 
         }; 
-        this._tmp = rec(this._tmp, fields, directs); 
+        this._tmp = arrRecursion(this._tmp, fields, directs); 
         return this._tmp; 
     };
     insert = (obj) => {
