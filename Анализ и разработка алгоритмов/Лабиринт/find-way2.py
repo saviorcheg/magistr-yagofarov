@@ -1,43 +1,35 @@
-import time
 import os
 
 os.chdir(r'C:\Users\serge\OneDrive\Рабочий стол\Magistr\Анализ и разработка алгоритмов\Лабиринт')
-f = open('ways.txt', 'r')
-lines = f.readlines()
-f.close()
 
-tab = []
-row, col = map(int, lines[0].split())
-for r in range(1, row+1):
-	tab.append(list(map(int, lines[r].split())))
-
-def get_naiv(row, col):
-	class Point():
-		def __init__(self,d,r,c):
-			self.d = d
-			self.r = r
-			self.c = c
-
-	ways = [Point(tab[0][0],0,0)]
-
-	for pos in range(row+col-2):
-		count_ways = len(ways)
-		for num in range(count_ways):
-			way = ways[num]
-			if way.r+1 < row:
-				ways.append(Point(way.d+tab[way.r+1][way.c],way.r+1,way.c))
-			if way.c+1 < col:
-				ways.append(Point(way.d+tab[way.r][way.c+1],way.r,way.c+1))
-		ways = ways[count_ways:]
-
-	return min([x.d for x in ways])
+def get_lab(file_name):
+    with open(file_name) as f:
+        lines = f.readlines()
+    return [[int(x) for x in s.split(',')] for s in lines]
 
 
-start = time.monotonic()
-# result = get_naiv(2, 2)
-result = get_naiv(row, col)
-finish = time.monotonic()
-dif = finish - start
-
-print(result)
-print(dif)
+def find_ways(x, y, v, string1, s): 
+    if x == rx-1 and y == ry-1:  # точка останова        
+        price_ways.append(v)
+        print('Маршрут с ценой :' + str(v))
+        string1 += s
+        print(string1)
+    else:  # шаги рекурсии  
+        if x < rx-1:            
+            find_ways(x+1,y,v+lab[y][x+1], string1, s + 'x')
+            print(string)
+        if y < ry-1:            
+            find_ways(x,y+1,v+lab[y+1][x], string1, s + 'y')
+            print(string)
+    
+string = ''     
+lab = get_lab('./ways/ways3.txt')
+for row in lab:
+    print(*row)
+rx, ry = len(lab[0]), len(lab)
+price_ways = []
+find_ways(0, 0, lab[0][0], string, '')
+# print (rx, ry)
+# print(price_ways)
+print(min(price_ways))
+print(max(price_ways))
