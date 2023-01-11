@@ -30,25 +30,33 @@ class Exam {
         this._tmp = JSON.parse(JSON.stringify(this._arr, fields));
         return this._tmp;
     }
-    orderBy = (fields, directs) => {
-        this._tmp = this._arr;
-        const comparator = (a, b, fields, directs) => {
-            let dict = { 'asc': +1, 'desc': -1 };
-            let d = dict[directs[0]], f = fields[0];
-        
-            // 1 точка останова - должна возвращать ответ
-            if ((fields.length === 1) || (a[f] !== b[f])) {
-                return d * (a[f] > b[f]? +1: -1); 
-            }
-            // 2 шаг рекурсии - вызов функции с оставшимися пар-ми для сортировки
-            return comparator(a, b, fields.slice(1,), directs.slice(1,));
-        }
-        
-        const orderBy = (fields, directs) => {
-            return this._tmp.sort((a,b) => comparator(a,b,fields,directs));
-        }
-        return orderBy(fields, directs);
-    }
+    orderBy = (fields, directs) => { 
+        const sortFn = (a, b, fields, direct) => { 
+            let res = 0; 
+            const fieldArr = fields.split("."); 
+            let field = fieldArr.shift(); 
+            if (fieldArr.length > 0) { // если ещё есть поля
+                res = sortFn(a[field], b[field], fieldArr.join("."), direct); 
+            } else { //иначе сортируем
+                res = a[field] > b[field] ? 1 : -1; 
+            }  
+            return direct == "desc" ? -res : res; 
+        }; 
+ 
+        const rec = (arr, fields, directs) => { 
+            if (fields.length == 0) { 
+                return arr; 
+            } 
+            const path = fields.shift(); 
+            const direct = directs.shift(); 
+            arr.sort((a, b) => { 
+                return sortFn(a, b, path, direct); 
+            }); 
+            return rec(arr, fields, directs); 
+        }; 
+        this._tmp = rec(this._tmp, fields, directs); 
+        return this._tmp; 
+    };
     insert = (obj) => {
         this._tmp = this._arr;
         this._tmp.push(obj);
